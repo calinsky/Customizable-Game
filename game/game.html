@@ -1,0 +1,124 @@
+<html>
+  <head>
+  <script>
+  
+  var keys = {left:false, up:false, right:false, down:false};
+  var car = {left:1220, top:655, move:null, show:null};
+  var villain = {left:1500, speed:0.8, style:null};
+  var timer = null;
+  
+  function keyDown( ke ) {
+    keyChange(ke.key, true);
+  
+    villain.speed = ke.shiftKey? 0.3 : 0.8;
+  }
+  
+  function keyUp( ke ) {
+    keyChange(ke.key, false);
+  }
+  
+  function keyChange( key, isPressed ) {
+    switch (key) {
+    case 'ArrowLeft': // left
+      keys.left = isPressed;
+      break;
+    case 'ArrowUp': // up
+      keys.up = isPressed;
+      break;
+    case 'ArrowRight': // right
+      keys.right = isPressed;
+      break;
+    case 'ArrowDown': // down
+      keys.down = isPressed;
+      break;
+    }
+  }
+  
+  function onClock() {
+    var newLeft = car.left; var newTop = car.top;
+    if (keys.left ) newLeft -= 1;
+    if (keys.up   ) newTop  -= 1;
+    if (keys.right) newLeft += 1;
+    if (keys.down ) newTop  += 1;
+    car.move(newLeft, newTop);
+  
+    if (villain.left > -10) villain.style.left = Math.round((villain.left -= villain.speed) /14.4) + '%';
+  
+    if (car.left < 236) onWin();
+    if (car.left > villain.left) {
+      car.move = function() {}
+      if (!car.is_green) {
+        car.is_green = true
+        var src = document.getElementById('car').src
+        document.getElementById('car').src = src.substring(0, src.length -4) + '_green.png';
+        car.show()
+      }
+    }
+  }
+  
+  function onWin() {
+    clearInterval(timer);
+  
+    villain.style.left = '-1%';
+    document.getElementById('confetti').style.visibility = 'visible';
+    document.getElementById('winning_text').style.visibility = 'visible';
+    var carDom = document.getElementById('car')
+    var carStyle = carDom.style;
+    carStyle.height = '40%';
+    carStyle.left = '10%';
+    carStyle.top = '70%';
+    car.show();
+  }
+  
+  function onLoad() {
+    // create road
+    var img = document.getElementById('road');
+    //img.crossOrigin = "";
+    var canvas = document.createElement('canvas');
+    canvas.width = 1440;
+    canvas.height = 754;
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    var road = canvas.getContext('2d');
+  
+    // villain
+    villain.style = document.getElementById('villain').style;
+    villain.style.left = villain.left;
+  
+    // set up car
+    var carDom = document.getElementById('car');
+    var carStyle = carDom.style;
+    carStyle.left = car.left
+    carStyle.top  = car.top
+    
+    car.move = function( newLeft, newTop ) {
+      if (road.getImageData(newLeft, newTop, 1, 1).data[2] == 188) {
+        if (newLeft > car.left) carDom.src = 'car_rev.png';
+        if (newLeft < car.left) carDom.src = 'car.png';
+        carStyle.left = (car.left = newLeft) /14.4 + '%';
+        carStyle.top  = (car.top  = newTop) /7.54 + '%';
+      }
+    };
+    car.show = function() { carStyle.zIndex = 1; };
+    setTimeout(function() { car.move(car.left, car.top); }, 1);
+  
+    // set interval clock
+    timer = setInterval(onClock, 10);
+  }
+  
+  </script>
+  </head>
+  <body onload="onLoad();" onkeydown="keyDown(event);" onkeyup="keyUp(event);" style="margin: 0; padding: 0;">
+  <div style="width: 1440; height: 754; background-image: url('map_for_game.png'); overflow: hidden; position: relative;">
+  
+    <img src="map_for_game.png" id="road" style="position: absolute; width: 100%; height: 100%;">
+  
+    <img id="car" src="car.png" style="position: absolute; height: 18%; margin: -9% 0 0 -8%;">
+  
+    <div id="villain" style="position: absolute; background-image: url('villain.gif'); background-size: 12%; width: 120%; height: 120%; left: 101%;"></div>
+  
+    <img id="confetti" src="confetti.gif" style="width: 100%; height: 100%; position: absolute; visibility: hidden; opacity: 0.95;">
+    <img id="winning_text" src="winning_text.png" style="width: 100%; height: 100%; position: absolute; visibility: hidden;">
+  
+  </div>
+  </body>
+  </html>
