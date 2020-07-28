@@ -5,7 +5,7 @@ Enjoy getting creative and making your own versions!
 Game's contents:
 By default, the game is set up as a "happy retirement" gift for my mother, who works in healthcare at a hospital.
 In this version of the game, she is fleeing the "villain" (Covid-19) as she makes her way home from work to enjoy retirement.
-The gift was a real hit! Hope you find similar success in your own iteration.
+The gift was a real hit! Hope you find similar success in your own iterations.
 
 
 	game.html			- Consolidated code
